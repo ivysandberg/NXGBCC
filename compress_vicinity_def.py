@@ -3,10 +3,10 @@ import pandas as pd
 import math
 import itertools
 
-from yapf.yapflib.yapf_api import FormatFile
-FormatFile(
-    "/Users/ivysandberg/dmc/NXGBCC/dev/compress_vicinity_def.py",
-    in_place=True)
+# from yapf.yapflib.yapf_api import FormatFile
+# FormatFile(
+#     "/Users/ivysandberg/dmc/NXGBCC/dev/compress_vicinity_def.py",
+#     in_place=True)
 
 # list of all the minutiae points
 list_of_minutiae = [(3, 2, 0.5), (-4, 1.2, 3.4), (5, -2, 4.4), (1, -1, 1),

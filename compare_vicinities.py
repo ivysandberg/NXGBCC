@@ -3,10 +3,10 @@ import pandas as pd
 import itertools
 import math
 
-from yapf.yapflib.yapf_api import FormatFile
-FormatFile(
-    "/Users/ivysandberg/dmc/NXGBCC/dev/compare_vicinities.py", in_place=True)
-''' Compare Vicinities '''
+# from yapf.yapflib.yapf_api import FormatFile
+# FormatFile(
+#     "/Users/ivysandberg/dmc/NXGBCC/dev/compare_vicinities.py", in_place=True)
+# ''' Compare Vicinities '''
 
 V1 = [(3, 2, 0.5), (-4, 1.2, 3.4), (5, -2, 4.4), (1, -1, 1), (3.6, 2, 0.5),
       (1, 1, 1), (-2, -0.3, 0), (1, 2, -4)]
@@ -38,3 +38,5 @@ for p, q in itertools.product(V1, V2):
     print(pairing_score(p, q))
 
     # Create matrix P x Q of all the pairing scores
+
+    
