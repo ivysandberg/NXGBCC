@@ -16,6 +16,16 @@ V2 = [(2.2, 3.1, -1.2), (-2, 3, 1), (1, 1, 1), (1, -1, -1), (4, 0, 0)]
 #for i in list_of_minutiae:
 #print (i[2])
 
+# def compare_vicinities(Vi,Vj):
+#     output_matrix = np.zeros((len(Vi),len(Vj)))
+#     for i in range(len(Vi)):
+#         for j in range(len(Vj)):
+#             matrix_value = Vi - Vj
+#             output_matrix[i,j]= matrix_value
+#         return output_matrix
+#
+# print (compare_vicinities(V1,V2))
+
 for p, q in itertools.product(V1, V2):
     print(p, q)
 
@@ -39,4 +49,12 @@ for p, q in itertools.product(V1, V2):
 
     # Create matrix P x Q of all the pairing scores
 
-    
+def compare_vicinities(Vi,Vj):
+    output_matrix = np.zeros((len(Vi),len(Vj)))
+    for i in range(len(Vi)):
+        for j in range(len(Vj)):
+            matrix_value = pairing_score(Vi[i], Vj[j])
+            output_matrix[i,j]= matrix_value
+    return output_matrix
+
+print (compare_vicinities(V1,V2))
