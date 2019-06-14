@@ -3,35 +3,14 @@ import pandas as pd
 import math
 import itertools
 
-from yapf.yapflib.yapf_api import FormatFile
-FormatFile(
-    "/Users/ivysandberg/dmc/NXGBCC/dev/compress_vicinity_def.py",
-    in_place=True)
+# from yapf.yapflib.yapf_api import FormatFile
+# FormatFile(
+#     "/Users/ivysandberg/dmc/NXGBCC/dev/compress_vicinity_def.py",
+#     in_place=True)
 
 # list of all the minutiae points
 list_of_minutiae = [(3, 2, 0.5), (-4, 1.2, 3.4), (5, -2, 4.4), (1, -1, 1),
                     (3.6, 2, 0.5), (1, 1, 1), (-2, -0.3, 0), (1, 2, -4)]
-
-# define a radius
-center_minutiae = list_of_minutiae[0]
-other_minutiae = list_of_minutiae[1:]
-
-
-def vicinity_within_radius(minutiae):
-    list_of_minutiae_in_r = []
-    r = 2.5
-    for i in other_minutiae:
-        x = i[0]
-        y = i[1]
-        if x**2 + y**2 <= r**2:
-            list_of_minutiae_in_r.append(other_minutiae)
-    return list_of_minutiae_in_r
-
-
-print(
-    "This is a list of all the mjs within radius = 2.5 when mi = (3, 2, 0.5) : "
-)
-print(vicinity_within_radius(list_of_minutiae))
 
 # Create a change of coords for every combination of mi (center minutiae) and mj (other minutiae)
 # print(itertools.combinations_with_replacement(list_of_minutiae, 2)) = every combination of coordinates
@@ -97,3 +76,17 @@ for mi, mj in itertools.combinations_with_replacement(list_of_minutiae, 2):
     #print("Vicintiy: ", vicinity(mi, mj))
     print("This is the change of coord for the mj point with mi at (0,0,0)")
     print(vicinity(mi, mj))
+
+    def radius(mi, mj):
+        list_of_minutiae_in_r = []
+        r = 2.5
+        x = mj[0] - mi[0]
+        y = mj[1] - mi[1]
+        if x**2 + y**2 <= r**2:
+            list_of_minutiae_in_r.append(mj)
+        return list_of_minutiae_in_r
+
+    print(
+        "If brackets empty; mj is not within the radius = 2.5 from mi. If mj is listed then mj is within the given radius"
+    )
+    print(radius(mi, mj))

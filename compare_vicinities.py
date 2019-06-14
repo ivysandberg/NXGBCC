@@ -74,7 +74,8 @@ print(vicinities_matrix(V3, V4))
 
 
 def Hungarian(matrix):
-    # Create matrix filled with values = 1 - pairing score, in order to find maximums, bc Hungarian is designed to minimize cost (in the assignment problem)
+    # Create matrix filled with values = 1 - pairing score, in order to find maximums
+    # Hungarian is designed to minimize cost (in the assignment problem)
     inv_matrix = []
     for row in matrix:
         #print(row)
@@ -116,4 +117,5 @@ V4 = [(1.1, 2.2, 3.3), (-1.1, -2.2, -3.3), (1.1, 2.2, 3.3)]
 V5 = [(1.1, 2.2, 3.3), (-1.1, -2.2, -3.3), (1.1, 2.2, 3.3)]
 
 M3 = (vicinities_matrix(V4, V5))
+print("This is the Hungarian alg on V4 and V5 (identical)")
 print (Hungarian(M3))
