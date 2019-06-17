@@ -87,6 +87,6 @@ for mi, mj in itertools.combinations_with_replacement(list_of_minutiae, 2):
         return list_of_minutiae_in_r
 
     print(
-        "If brackets empty; mj is not within the radius = 2.5 from mi. If mj is listed then mj is within the given radius"
+        "If the following brackets are empty; mj is not within the radius = 2.5 from mi. If mj is listed then mj is within the given radius"
     )
     print(radius(mi, mj))
