@@ -42,10 +42,7 @@ def new_theta_coord(mi, mj):
     return θ
 
 def new_mj_coords(mi, mj):
-    output = []
-    output.append(new_x_coord(mi,mj))  # broke up the append statements to avoid double brackets
-    output.append(new_y_coord(mi,mj))
-    output.append(new_theta_coord(mi,mj))
+    output = (new_x_coord(mi,mj), new_y_coord(mi,mj), new_theta_coord(mi,mj))
     return output
 
 # the following functions (distance, unit_vector, and angle_between points)
@@ -83,7 +80,7 @@ def get_vicinities_from_minutia_list(minutia_list, radius):
         this_vicinity = []
         this_vicinity.append(i)
         for j in minutia_list:
-            if compute_distance(i,j) < radius:
+            if compute_distance(i,j) < radius and i != j: #add if i != j
                 this_vicinity.append(j)
         all_vicinities.append(this_vicinity)
     return all_vicinities
@@ -116,11 +113,13 @@ def normalize_this_vicinity(vicinity):
 def normalize_vicinities(list_of_vicinities):
     output = []
     for i in list_of_vicinities:
-        output.append(normalize_this_vicinity(i)) # note: you'll need to write 'normalizeThisVicinity'
+        output.append(normalize_this_vicinity(i))
     return output
 
 
 
+
+# Compare Minutiae
 
 # Conduct comparisons to find similar minutiae
 # This function compares minutia points
@@ -136,7 +135,7 @@ def compare_minutiae(Mi, Mj, sigmaX, sigmaY, sigmatheta):
 
 # Input two vicinities
 # Output Constructs a matrix populated with the pairing scores of each minutiae in vic1 matched with minutiae in vic2
-def minutiae_pairing_scores_matrix(vic_i, vic_j):
+def create_minutiae_pairing_scores_matrix(vic_i, vic_j):
     output_matrix = np.zeros((len(vic_i), len(vic_j)))
     for i in range(len(vic_i)):
         for j in range(len(vic_j)):
@@ -149,8 +148,8 @@ def minutiae_pairing_scores_matrix(vic_i, vic_j):
 # Compare Vicinities
 
 # Create matrix filled with values = 1 - pairing score, in order to find maximums
-# Hungarian is designed to minimize cost (in the assignment problem)
-def Hungarian(matrix):
+# Do this b/c the Hungarian alg is designed to minimize cost (in the assignment problem)
+def invert_matrix(matrix):
     inv_matrix = []
     for row in matrix:
         #print(row)
@@ -165,10 +164,9 @@ def Hungarian(matrix):
 
 # Input: the inverted minutiae_pairing_scores_matrix of two vicinities
 # Inputed matrix computed by Hungarian(output_matrix from the minutiae_pairing_scores_matrix)
-
 # Output: use the Hungarian alg to compute the best pairs in the two vicinities
 # and an overall pair score of the two vicinities (identical = 0)
-def compare_vicinities(inv_matrix):
+def get_comparison_score(inv_matrix):
     m = Munkres()  # Munkres = Hungarian
     indexes = m.compute(inv_matrix)
     #print_matrix(inv_matrix, msg='compute highest pairing scores')
@@ -176,8 +174,26 @@ def compare_vicinities(inv_matrix):
     for row, col in indexes:
         val = inv_matrix[row][col]
         total += val
-    comparison_score = f'sum of scores: {total}'
+    comparison_score = total        # use this to print out just the comparison score and then populate the comparison score matrix 
+    # comparison_score = f'sum of scores: {total}'      # this prints out "Sum of Scores: total"
     return comparison_score
+
+
+def compare_vicinities(vic1, vic2):
+    pairing_scores_matrix = create_minutiae_pairing_scores_matrix(vic1, vic2)
+    inv_matrix = invert_matrix(pairing_scores_matrix)
+    score = get_comparison_score(inv_matrix)
+    return score
+
+
+
+def create_vicinity_comparison_scores_matrix(list_of_vicinities_1, list_of_vicinities_2):
+    output_matrix = np.zeros((len(list_of_vicinities_1), len(list_of_vicinities_2)))
+    for i in range(len(list_of_vicinities_1)):
+        for j in range(len(list_of_vicinities_2)):
+            matrix_value = compare_vicinities(list_of_vicinities_1[i], list_of_vicinities_2[j])
+            output_matrix[i, j] = matrix_value
+    return output_matrix
 
 
 
@@ -193,37 +209,45 @@ list_of_minutiae = [(3, 2, 0.5), (-4, 1.2, 3.4), (5, -2, 4.4), (1, -1, 1),
 
 # Create a change of coords for every combination of mi (center minutiae) and mj (other minutiae)
 
-for mi, mj in itertools.combinations_with_replacement(list_of_minutiae, 2):
-    print("This is the (mi, mj) coordinate pair being changed: ", mi, mj)
-    print ("New mj coords with mi now at (0,0,0): ", new_mj_coords(mi,mj))
-#     print ("Pairing Score: ", compare_minutiae(mi, mj, 2.5, 4.1, 1.2))
-#
+#for mi, mj in itertools.combinations_with_replacement(list_of_minutiae, 2):
+    # print("This is the (mi, mj) coordinate pair being changed: ", mi, mj)
+    # print ("New mj coords with mi now at (0,0,0): ", new_mj_coords(mi,mj))
+    # print ("Pairing Score: ", compare_minutiae(mi, mj, 2.5, 4.1, 1.2))
+
+
 
 # Create a list of of vicinities
 # each vicinity has a list of minutia points within a certain radius from mi
 # loop through list_of_minutiae so each minutia is mi once
+# print ("List of Vicinities: ")
 # print (get_vicinities_from_minutia_list(list_of_minutiae, 3))
 
-# filter list
-vicinities_with_radius_of_3 = get_vicinities_from_minutia_list(list_of_minutiae, 3)
-# print (filter_list_of_vinities_by_size(vicinities_with_radius_of_3, 4, 10))
 
-# Normalize the first vicinity in the list of vicinities
-vicinity_1 = vicinities_with_radius_of_3[0]
-# print (normalize_this_vicinity(vicinity_1))
-
-# Normalize all the vicinities in a list of vicinities
-print (normalize_vicinities(vicinities_with_radius_of_3))
+# Normalize vicinities
+# sets the first minutiae as mi = (0,0,0) and translates the other minutiae (mjs) accordingly
+list_of_vicinities = get_vicinities_from_minutia_list(list_of_minutiae,3)
+# print ("Normalized List of Vicinities: ")
+# print (normalize_vicinities(list_of_vicinities))
 
 
-# populate a matrix with the pairing scores of all the minutiae in on vicinity to all the minutiae in another vicinity
-# vicinity_2 = vicinities_with_radius_of_3[1]
-# print ("Vicinity 1: ", vicinity_1)
-# print ("Vicinity 2: ", vicinity_2)
-# print (minutiae_pairing_scores_matrix(vicinity_1, vicinity_2))
-#
-# output_matrix = minutiae_pairing_scores_matrix(vicinity_1, vicinity_2)
-# # print (Hungarian(output_matrix))
-#
-# inv_matrix = Hungarian(output_matrix)
-# print ("Comparison Score: ", compare_vicinities(inv_matrix))
+# Compare two vicinities
+# Create a matrix of pairing scores
+normalized_list_of_vicinities = normalize_vicinities(list_of_vicinities)
+vic1 = normalized_list_of_vicinities[0]
+vic2 = normalized_list_of_vicinities[1]
+# print("Pairing Scores Matrix between Vic1 and Vic2: ")
+# print (create_minutiae_pairing_scores_matrix(vic1, vic2))
+
+# Compute Pair score
+# print ("Comparison Score of Vic1 and Vic2: ", compare_vicinities(vic1, vic2))
+
+
+
+# Output the comparison scores for every combination of vicinities in a list of vicinities :
+# for vic_i, vic_j in itertools.combinations_with_replacement(normalized_list_of_vicinities, 2):
+#     print (vic_i, vic_j)
+#     print (compare_vicinities(vic_i, vic_j))
+
+
+# Build a matrix populated with vicinity comparison scores
+print (create_vicinity_comparison_scores_matrix(normalized_list_of_vicinities, normalized_list_of_vicinities))
