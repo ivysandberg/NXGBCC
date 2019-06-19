@@ -2,7 +2,7 @@
 We are choosing to characterize Fingerprints by neighborhoods of defining points.
 
 These defining points are called Minuitae points and are tuples of length four: (X, Y, direction in radians, type).
-Type is either a ridge ending or a bifrications.
+Type is either a ridge ending or a bifrication.
 
 The neighborhoods of these points are called vicinities. Multiple vicinities cover the space of a fingerprint.
 Vicinities are represented as vectors, and a set of vicinities from one fingerprint are compared to the set of another to determine matches.
@@ -43,11 +43,13 @@ def new_theta_coord(mi, mj):
 
 def new_mj_coords(mi, mj):
     output = []
-    output.append([new_x_coord(mi,mj), new_y_coord(mi,mj), new_theta_coord(mi,mj)])  # creates the double brackets
+    output.append(new_x_coord(mi,mj))  # broke up the append statements to avoid double brackets
+    output.append(new_y_coord(mi,mj))
+    output.append(new_theta_coord(mi,mj))
     return output
 
 # the following functions (distance, unit_vector, and angle_between points)
-# are needed to compute the above change of coordinates functions
+# are needed to compute the above 'change of coordinate' functions
 def compute_distance(mi, mj):
     dist = math.sqrt((mj[0] - mi[0])**2 + (mj[1] - mi[1])**2)
     return dist
@@ -57,7 +59,7 @@ def compute_distance(mi, mj):
 # Output: the minutiae in unit vector form
 def unit_vector(list_of_minutiae):
     return list_of_minutiae / np.linalg.norm(
-        list_of_minutiae)  # this statement breaks when mj = (0,0,0)
+        list_of_minutiae)  # this statement breaks when minutiae = (0,0,0)
 
 
 def angle_between(mi, mj):
@@ -68,11 +70,12 @@ def angle_between(mi, mj):
 
 
 
-# THE FOLLOWING FUNCTION CONSTRUTS VICINITIES (LISTS OF MINUTIAE)
+# THE FOLLOWING FUNCTION CONSTRUTS VICINITIES (WHICH ARE LISTS OF MINUTIAE)
 # each vicinity covers a certain area of a fingerprint & areas overlap
 
-# this function takes in a minutia list and radius
-# it returns all the un-normalizedvicinities it can find
+# Input: this function takes in a minutia list and a given radius
+# Output: it returns all the un-normalizedvicinities it can find
+# by taking each minutia in the list and returning all the minutiae within a given radius.
 # the un-normalized vicinities are a list of triples
 def get_vicinities_from_minutia_list(minutia_list, radius):
     all_vicinities = []
@@ -86,7 +89,7 @@ def get_vicinities_from_minutia_list(minutia_list, radius):
     return all_vicinities
 
 
-# Function takes in a list of vicinities (as put out by getVicinitiesFromMinutiaList)
+# Function takes in a list of vicinities (the output from get_vicinities_from_minutia_list)
 # Returns the same list, but removes vicinities with too few or too many minutia points
 def filter_list_of_vinities_by_size(list_of_vicinities, min_len, max_len):
     output = []
@@ -95,6 +98,9 @@ def filter_list_of_vinities_by_size(list_of_vicinities, min_len, max_len):
             output.append(i)
     return output
 
+# Input: a single vicinity
+# (i.e. a single vicinity indexed from the list from the output from get_vicinities_from_minutia_list or filter_list_of_vinities_by_size)
+# Output: a normalized_vicinity (the coordinates of the mjs have been changed relative to the set mi when moved to (0,0,0))
 def normalize_this_vicinity(vicinity):
     mi = vicinity[0]
     mj = vicinity[1:]
@@ -104,6 +110,9 @@ def normalize_this_vicinity(vicinity):
         normalized_vicinity.append(new_mj)
     return normalized_vicinity
 
+
+# Input: a list of vicinities (i.e. the output from get_vicinities_from_minutia_list or filter_list_of_vinities_by_size)
+# Ouput: all the vicinities in the list get normalized
 def normalize_vicinities(list_of_vicinities):
     output = []
     for i in list_of_vicinities:
@@ -184,9 +193,9 @@ list_of_minutiae = [(3, 2, 0.5), (-4, 1.2, 3.4), (5, -2, 4.4), (1, -1, 1),
 
 # Create a change of coords for every combination of mi (center minutiae) and mj (other minutiae)
 
-# for mi, mj in itertools.combinations_with_replacement(list_of_minutiae, 2):
-#     print("This is the (mi, mj) coordinate pair being changed: ", mi, mj)
-#     print ("New mj coords with mi now at (0,0,0): ", new_mj_coords(mi,mj))
+for mi, mj in itertools.combinations_with_replacement(list_of_minutiae, 2):
+    print("This is the (mi, mj) coordinate pair being changed: ", mi, mj)
+    print ("New mj coords with mi now at (0,0,0): ", new_mj_coords(mi,mj))
 #     print ("Pairing Score: ", compare_minutiae(mi, mj, 2.5, 4.1, 1.2))
 #
 
@@ -204,17 +213,17 @@ vicinity_1 = vicinities_with_radius_of_3[0]
 # print (normalize_this_vicinity(vicinity_1))
 
 # Normalize all the vicinities in a list of vicinities
-# print (normalize_vicinities(vicinities_with_radius_of_3))
+print (normalize_vicinities(vicinities_with_radius_of_3))
 
 
 # populate a matrix with the pairing scores of all the minutiae in on vicinity to all the minutiae in another vicinity
-vicinity_2 = vicinities_with_radius_of_3[1]
-print ("Vicinity 1: ", vicinity_1)
-print ("Vicinity 2: ", vicinity_2)
-print (minutiae_pairing_scores_matrix(vicinity_1, vicinity_2))
-
-output_matrix = minutiae_pairing_scores_matrix(vicinity_1, vicinity_2)
-# print (Hungarian(output_matrix))
-
-inv_matrix = Hungarian(output_matrix)
-print ("Comparison Score: ", compare_vicinities(inv_matrix))
+# vicinity_2 = vicinities_with_radius_of_3[1]
+# print ("Vicinity 1: ", vicinity_1)
+# print ("Vicinity 2: ", vicinity_2)
+# print (minutiae_pairing_scores_matrix(vicinity_1, vicinity_2))
+#
+# output_matrix = minutiae_pairing_scores_matrix(vicinity_1, vicinity_2)
+# # print (Hungarian(output_matrix))
+#
+# inv_matrix = Hungarian(output_matrix)
+# print ("Comparison Score: ", compare_vicinities(inv_matrix))
