@@ -10,7 +10,7 @@ import itertools
 
 # list of all the minutiae points
 list_of_minutiae = [(3, 2, 0.5), (-4, 1.2, 3.4), (5, -2, 4.4), (1, -1, 1),
-                    (3.6, 2, 0.5), (1, 1, 1), (-2, -0.3, 0), (1, 2, -4)]
+                    (3.6, 2, 0.5), (1, 1, 1), (-2, -0.3, 0), (1, 2, -4), (0,0,0)]
 
 # Create a change of coords for every combination of mi (center minutiae) and mj (other minutiae)
 # print(itertools.combinations_with_replacement(list_of_minutiae, 2)) = every combination of coordinates
@@ -21,7 +21,7 @@ for mi, mj in itertools.combinations_with_replacement(list_of_minutiae, 2):
 
     # Functions needed to determine the change of coordinates when one coord is translated & rotated to the origin
 
-
+    # move functions to the top outside the for loop
     def distance(mi, mj):
         dist = math.sqrt((mj[0] - mi[0])**2 + (mj[1] - mi[1])**2)
         return dist

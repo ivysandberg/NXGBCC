@@ -38,8 +38,8 @@ def new_y_coord(mi, mj):
     return Y
 
 def new_theta_coord(mi, mj):
-    θ = mi[2] - mj[2]
-    return θ
+    theta = mi[2] - mj[2]
+    return theta
 
 def new_mj_coords(mi, mj):
     output = (new_x_coord(mi,mj), new_y_coord(mi,mj), new_theta_coord(mi,mj))
@@ -91,7 +91,7 @@ def get_vicinities_from_minutia_list(minutia_list, radius):
 def filter_list_of_vinities_by_size(list_of_vicinities, min_len, max_len):
     output = []
     for i in list_of_vicinities:
-        if len(i) > min_len and len(i) < max_len:
+        if len(i) >= min_len and len(i) <= max_len:
             output.append(i)
     return output
 
@@ -156,7 +156,7 @@ def invert_matrix(matrix):
         inv_row = []
         for col in row:
             inv_row += [1 - col]
-            inv_matrix += [inv_row]
+        inv_matrix += [inv_row]
     return inv_matrix
 
 
@@ -174,7 +174,7 @@ def get_comparison_score(inv_matrix):
     for row, col in indexes:
         val = inv_matrix[row][col]
         total += val
-    comparison_score = total        # use this to print out just the comparison score and then populate the comparison score matrix 
+    comparison_score = total        # use this to print out just the comparison score and then populate the comparison score matrix
     # comparison_score = f'sum of scores: {total}'      # this prints out "Sum of Scores: total"
     return comparison_score
 
@@ -194,6 +194,18 @@ def create_vicinity_comparison_scores_matrix(list_of_vicinities_1, list_of_vicin
             matrix_value = compare_vicinities(list_of_vicinities_1[i], list_of_vicinities_2[j])
             output_matrix[i, j] = matrix_value
     return output_matrix
+
+
+
+def filter_list_of_vinities_by_similarity(list1, list2, min_comparison_score):
+    # if two vicinities have a comparison_score < the min_comparison_score then one must be removed
+    output = []
+    for i in list1:
+        for j in list2:
+            if compare_vicinities(i,j) > min_comparison_score:
+                output.append(i)
+    return output
+
 
 
 
@@ -250,4 +262,125 @@ vic2 = normalized_list_of_vicinities[1]
 
 
 # Build a matrix populated with vicinity comparison scores
-print (create_vicinity_comparison_scores_matrix(normalized_list_of_vicinities, normalized_list_of_vicinities))
+# in this case I'm building it out by (normalized_list_of_vicinities X normalized_list_of_vicinities)
+list = filter_list_of_vinities_by_size(normalized_list_of_vicinities, 2, 4)
+# print (list)
+mat = create_vicinity_comparison_scores_matrix(list, list)
+# print (type(mat))
+
+
+
+
+# FIND K VICINITIES THAT MAXIMIZE THE MINIMUM DISTANCE BETWEEN X AND ALL POINTS IN THE HEAP
+
+
+print ("Matrix of Vicinity Comparison Scores: ")
+print (mat)
+
+# Input: matrix as a 2D numpy array and k = # of vicinities want in Representative set
+# Ouput: indices of the vicinities for the Representative set
+
+def k_distinct_vicinities(mat, k):
+
+    heap = []
+    r = np.random.choice(range(mat.shape[0]))       # randomly choose the first row
+    heap.append(r)
+    next_vic = np.argmax(mat[r])    # choose the row furthest from that one
+    heap.append(next_vic)
+
+    # supposed we have some points already, called 'heap'
+
+
+    for j in range(k-2):
+        min_distances_to_the_heap = []
+        best_point = 'done'
+
+        print ("heap: ", heap)
+
+        for i in range(mat.shape[1]):
+            if i in heap:
+                continue
+            this_point_min_dist_to_heap = np.min(mat[heap,i])
+            print (mat[heap,i])
+            min_distances_to_the_heap.append(this_point_min_dist_to_heap)
+            current_largest_min = np.max(min_distances_to_the_heap)
+            if this_point_min_dist_to_heap == current_largest_min:
+                best_point = i
+
+        print("min distances: ", min_distances_to_the_heap)
+
+        heap.append(best_point)
+
+    chosen_vicinities_from_heap = []
+    for i in heap:
+        chosen_vicinities = list[i]
+        chosen_vicinities_from_heap.append(chosen_vicinities)
+        # print ("chosen_vicinities: ", chosen_vicinities)
+
+    return heap, ("chosen_vicinities: ", chosen_vicinities_from_heap)
+
+
+print (k_distinct_vicinities(mat, 4))
+
+
+
+
+
+
+
+
+# make some example data to sample workflow
+
+num_prints = 1000
+min_minutia = 25
+max_minutia = 125
+xlim = (0,100)
+ylim = (0,100)
+
+def makeMinutia(xlim, ylim):
+    x = np.random.uniform(xlim[0], xlim[1])
+    y = np.random.uniform(ylim[0], ylim[1])
+    rad = np.random.uniform(0, 2*math.pi)
+    output = (x,y,rad)
+    return output
+
+def makePrint(min_minutia, max_minutia, xlim, ylim):
+    output = []
+    num_minutia = int(np.random.uniform(min_minutia, max_minutia))
+    for i in range(num_minutia):
+        output.append(makeMinutia(xlim, ylim))
+    return output
+
+def makeNumPrints(nPrints, min_minutia, max_minutia, xlim, ylim):
+    output = []
+    for i in range(nPrints):
+        output.append(makePrint(min_minutia, max_minutia, xlim, ylim))
+    return output
+
+prints = makeNumPrints(3, 3, 5, (0,10),(0,10))
+
+# print (prints)
+
+
+# print ("minutia list: ", prints[0])
+
+
+# get vicinities from minutiae points, parameters = minutiae, radius
+ex_vicinities = get_vicinities_from_minutia_list(prints[0], 3)
+# print ("Vicinities: ", ex_vicinities)
+
+# normalize vicintiies
+norm_ex_vicinities = normalize_vicinities(ex_vicinities)
+# print ("Normalized Vicinities: ", norm_ex_vicinities)
+
+
+comparison_matrix = create_vicinity_comparison_scores_matrix(ex_vicinities, ex_vicinities)
+# print (comparison_matrix)
+
+
+
+
+
+
+# test with json file of minutiae data
+import json

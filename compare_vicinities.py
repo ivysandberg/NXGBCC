@@ -25,12 +25,12 @@ for p, q in itertools.product(V1, V2):
 
     def pairing_score(p, q):
         #output = []
-        sd_x = 2.3
+        sd_x = 2.3  # need to define later!!!
         sd_y = 4.1
         sd_theta = 1.2
-        score = math.exp((-((p[0] - q[0])**2) / sd_x)) * math.exp(
-            (-((p[1] - q[1])**2) / sd_y)) * math.exp(
-                (-((p[2] - q[2])**2) / sd_theta))
+        score = math.exp((-((p[0] - q[0])**2) / sd_x**2)) * math.exp(
+            (-((p[1] - q[1])**2) / sd_y**2)) * math.exp(
+                (-((p[2] - q[2])**2) / sd_theta**2))
         output = np.array(score)
 
         #output.append(score)
