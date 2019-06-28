@@ -271,11 +271,11 @@ mat = create_vicinity_comparison_scores_matrix(list, list)
 
 
 
+
 # FIND K VICINITIES THAT MAXIMIZE THE MINIMUM DISTANCE BETWEEN X AND ALL POINTS IN THE HEAP
 
-
-print ("Matrix of Vicinity Comparison Scores: ")
-print (mat)
+# print ("Matrix of Vicinity Comparison Scores: ")
+# print (mat)
 
 # Input: matrix as a 2D numpy array and k = # of vicinities want in Representative set
 # Ouput: indices of the vicinities for the Representative set
@@ -380,7 +380,46 @@ comparison_matrix = create_vicinity_comparison_scores_matrix(ex_vicinities, ex_v
 
 
 
-
-
 # test with json file of minutiae data
 import json
+
+with open('ex_data.txt') as json_file:
+    data = json.load(json_file)
+
+json_string = json.dumps(data, indent=4)
+# print (json_string)
+
+
+# print (data)
+
+# for key, value in data.items():
+# 	print(key + ':' , value)
+
+
+# minutiae = data['minutiae']
+
+
+# Input: the data from one json file = data from one fingerprint image
+# Output: the minutiae data as a list of coordinates
+def create_minutiae_coords(data):
+    list_of_minutiae_coords = []
+    minutiae = data['minutiae']
+    for i in minutiae:
+        # print (i)
+        output = (i['x'], i['y'], i['direction'])
+        # print (output)
+        list_of_minutiae_coords.append(output)
+    return list_of_minutiae_coords
+
+
+
+minutia_list = create_minutiae_coords(data)
+
+vicinities = get_vicinities_from_minutia_list(minutia_list, 50)
+# print ("Vicinities: ", vicinities)
+
+nom_vicinities = normalize_vicinities(vicinities)
+# print (nom_vicinities)
+
+comp_scores_matrix = create_vicinity_comparison_scores_matrix(nom_vicinities, nom_vicinities)
+# print (comp_scores_matrix)
