@@ -213,70 +213,6 @@ def filter_list_of_vinities_by_similarity(list1, list2, min_comparison_score):
 
 
 
-
-
-
-# TEST FUNCTIONS :
-
-# example set of minutiae
-list_of_minutiae = [(3, 2, 0.5), (-4, 1.2, 3.4), (5, -2, 4.4), (1, -1, 1),
-                    (3.6, 2, 0.5), (1, 1, 1), (-2, -0.3, 0), (1, 2, -4)]
-
-
-
-# Create a change of coords for every combination of mi (center minutiae) and mj (other minutiae)
-
-#for mi, mj in itertools.combinations_with_replacement(list_of_minutiae, 2):
-    # print("This is the (mi, mj) coordinate pair being changed: ", mi, mj)
-    # print ("New mj coords with mi now at (0,0,0): ", new_mj_coords(mi,mj))
-    # print ("Pairing Score: ", compare_minutiae(mi, mj, 2.5, 4.1, 1.2))
-
-
-
-# Create a list of of vicinities
-# each vicinity has a list of minutia points within a certain radius from mi
-# loop through list_of_minutiae so each minutia is mi once
-# print ("List of Vicinities: ")
-# print (get_vicinities_from_minutia_list(list_of_minutiae, 3))
-
-
-# Normalize vicinities
-# sets the first minutiae as mi = (0,0,0) and translates the other minutiae (mjs) accordingly
-list_of_vicinities = get_vicinities_from_minutia_list(list_of_minutiae,3)
-# print ("Normalized List of Vicinities: ")
-# print (normalize_vicinities(list_of_vicinities))
-
-
-# Compare two vicinities
-# Create a matrix of pairing scores
-normalized_list_of_vicinities = normalize_vicinities(list_of_vicinities)
-vic1 = normalized_list_of_vicinities[0]
-vic2 = normalized_list_of_vicinities[1]
-# print("Pairing Scores Matrix between Vic1 and Vic2: ")
-# print (create_minutiae_pairing_scores_matrix(vic1, vic2))
-
-# Compute Pair score
-# print ("Comparison Score of Vic1 and Vic2: ", compare_vicinities(vic1, vic2))
-
-
-
-# Output the comparison scores for every combination of vicinities in a list of vicinities :
-# for vic_i, vic_j in itertools.combinations_with_replacement(normalized_list_of_vicinities, 2):
-#     print (vic_i, vic_j)
-#     print (compare_vicinities(vic_i, vic_j))
-
-
-# Build a matrix populated with vicinity comparison scores
-# in this case I'm building it out by (normalized_list_of_vicinities X normalized_list_of_vicinities)
-list = filter_list_of_vinities_by_size(normalized_list_of_vicinities, 2, 4)
-# print (list)
-mat = create_vicinity_comparison_scores_matrix(list, list)
-# print (type(mat))
-
-
-
-
-
 # FIND K VICINITIES THAT MAXIMIZE THE MINIMUM DISTANCE BETWEEN X AND ALL POINTS IN THE HEAP
 
 # print ("Matrix of Vicinity Comparison Scores: ")
@@ -300,29 +236,29 @@ def k_distinct_vicinities(mat, k):
         min_distances_to_the_heap = []
         best_point = 'done'
 
-        print ("heap: ", heap)
+        # print ("heap: ", heap)
 
         for i in range(mat.shape[1]):
             if i in heap:
                 continue
             this_point_min_dist_to_heap = np.min(mat[heap,i])
-            print (mat[heap,i])
+            # print (mat[heap,i])
             min_distances_to_the_heap.append(this_point_min_dist_to_heap)
             current_largest_min = np.max(min_distances_to_the_heap)
             if this_point_min_dist_to_heap == current_largest_min:
                 best_point = i
 
-        print("min distances: ", min_distances_to_the_heap)
+        # print("min distances: ", min_distances_to_the_heap)
 
         heap.append(best_point)
 
-    chosen_vicinities_from_heap = []
-    for i in heap:
-        chosen_vicinities = list[i]
-        chosen_vicinities_from_heap.append(chosen_vicinities)
+    # chosen_vicinities_from_heap = []
+    # for i in heap:
+    #     chosen_vicinities = list[i]
+    #     chosen_vicinities_from_heap.append(chosen_vicinities)
         # print ("chosen_vicinities: ", chosen_vicinities)
 
-    return heap, ("chosen_vicinities: ", chosen_vicinities_from_heap)
+    return heap
 
 
 # print (k_distinct_vicinities(mat, 4))

@@ -1,16 +1,13 @@
 '''
-Analyzing real minutia data from fingerprint images
+Analyzing real minutia data from fingerprint images. Data Format: json
 
 '''
 
 import numpy as np
 import math
 from Vectorizing_Fingerprints import *
-
-
-
-# test with json file of minutiae data
 import json
+
 
 with open('/Users/ivysandberg/dmc/NXGBCC/data/fingerprints/f0001_01.png.templatedata') as json_file:
     data = json.load(json_file)
@@ -71,3 +68,8 @@ list = filter_list_of_vinities_by_size(nom_vicinities, 4, 7)
 
 comp_scores_matrix = create_vicinity_comparison_scores_matrix(list, list)
 print (comp_scores_matrix)
+
+print ("Heap: ", k_distinct_vicinities(comp_scores_matrix, 10))
+indices_of_vicinities_in_heap = k_distinct_vicinities(comp_scores_matrix, 10)
+for i in indices_of_vicinities_in_heap:
+    print (list[i])
