@@ -34,11 +34,11 @@ def new_x_coord(mi, mj):
     return X
 
 def new_y_coord(mi, mj):
-    Y = compute_distance(mi, mj) * (math.sin(angle_between(mi, mj) - mi[2]))
+    Y = -compute_distance(mi, mj) * (math.sin(angle_between(mi, mj) - mi[2]))
     return Y
 
 def new_theta_coord(mi, mj):
-    theta = mi[2] - mj[2]
+    theta = mj[2] - mi[2]
     return theta
 
 def new_mj_coords(mi, mj):
@@ -50,6 +50,7 @@ def new_mj_coords(mi, mj):
 def compute_distance(mi, mj):
     dist = math.sqrt((mj[0] - mi[0])**2 + (mj[1] - mi[1])**2)
     return dist
+
 
 # function to compute unit vectors which are needed to compute the angles between vectors
 # Input: any number of minutiae
@@ -64,7 +65,6 @@ def angle_between(mi, mj):
     mj_u = unit_vector(mj)
     angle = np.arccos(np.clip(np.dot(mi_u, mj_u), -1.0, 1.0))
     return angle
-
 
 
 # THE FOLLOWING FUNCTION CONSTRUTS VICINITIES (WHICH ARE LISTS OF MINUTIAE)
@@ -139,7 +139,12 @@ def create_minutiae_pairing_scores_matrix(vic_i, vic_j):
     output_matrix = np.zeros((len(vic_i), len(vic_j)))
     for i in range(len(vic_i)):
         for j in range(len(vic_j)):
-            matrix_value = compare_minutiae(vic_i[i], vic_j[j], 2.5, 4.1, 1.2)
+            matrix_value = compare_minutiae(vic_i[i], vic_j[j], 135, 120, 1.85)
+            '''
+            Using a sample standard deviations of each x, y, & theta from one fingerprint image.
+            Need more accurate measurements
+
+            '''
             output_matrix[i, j] = matrix_value
     return output_matrix
 
@@ -320,106 +325,4 @@ def k_distinct_vicinities(mat, k):
     return heap, ("chosen_vicinities: ", chosen_vicinities_from_heap)
 
 
-print (k_distinct_vicinities(mat, 4))
-
-
-
-
-
-
-
-
-# make some example data to sample workflow
-
-num_prints = 1000
-min_minutia = 25
-max_minutia = 125
-xlim = (0,100)
-ylim = (0,100)
-
-def makeMinutia(xlim, ylim):
-    x = np.random.uniform(xlim[0], xlim[1])
-    y = np.random.uniform(ylim[0], ylim[1])
-    rad = np.random.uniform(0, 2*math.pi)
-    output = (x,y,rad)
-    return output
-
-def makePrint(min_minutia, max_minutia, xlim, ylim):
-    output = []
-    num_minutia = int(np.random.uniform(min_minutia, max_minutia))
-    for i in range(num_minutia):
-        output.append(makeMinutia(xlim, ylim))
-    return output
-
-def makeNumPrints(nPrints, min_minutia, max_minutia, xlim, ylim):
-    output = []
-    for i in range(nPrints):
-        output.append(makePrint(min_minutia, max_minutia, xlim, ylim))
-    return output
-
-prints = makeNumPrints(3, 3, 5, (0,10),(0,10))
-
-# print (prints)
-
-
-# print ("minutia list: ", prints[0])
-
-
-# get vicinities from minutiae points, parameters = minutiae, radius
-ex_vicinities = get_vicinities_from_minutia_list(prints[0], 3)
-# print ("Vicinities: ", ex_vicinities)
-
-# normalize vicintiies
-norm_ex_vicinities = normalize_vicinities(ex_vicinities)
-# print ("Normalized Vicinities: ", norm_ex_vicinities)
-
-
-comparison_matrix = create_vicinity_comparison_scores_matrix(ex_vicinities, ex_vicinities)
-# print (comparison_matrix)
-
-
-
-
-# test with json file of minutiae data
-import json
-
-with open('ex_data.txt') as json_file:
-    data = json.load(json_file)
-
-json_string = json.dumps(data, indent=4)
-# print (json_string)
-
-
-# print (data)
-
-# for key, value in data.items():
-# 	print(key + ':' , value)
-
-
-# minutiae = data['minutiae']
-
-
-# Input: the data from one json file = data from one fingerprint image
-# Output: the minutiae data as a list of coordinates
-def create_minutiae_coords(data):
-    list_of_minutiae_coords = []
-    minutiae = data['minutiae']
-    for i in minutiae:
-        # print (i)
-        output = (i['x'], i['y'], i['direction'])
-        # print (output)
-        list_of_minutiae_coords.append(output)
-    return list_of_minutiae_coords
-
-
-
-minutia_list = create_minutiae_coords(data)
-
-vicinities = get_vicinities_from_minutia_list(minutia_list, 50)
-# print ("Vicinities: ", vicinities)
-
-nom_vicinities = normalize_vicinities(vicinities)
-# print (nom_vicinities)
-
-comp_scores_matrix = create_vicinity_comparison_scores_matrix(nom_vicinities, nom_vicinities)
-# print (comp_scores_matrix)
+# print (k_distinct_vicinities(mat, 4))
