@@ -1,4 +1,8 @@
 # NXGBCC
+
+For an indepth explanation to the Fingerprint hash approach here: https://docs.google.com/document/d/1OkhVMNrllXu0T6eg3PnfpK556qRn8zn8bwPBMbIStD0/edit
+
+
 Vectorizing_Fingerprints: contains functions for vectorizing fingerprints into rotaionally and translationally invariant representative sets of vicinities. 
 
 Vectorizing_Fingerprints02: optimizes previous functions 
